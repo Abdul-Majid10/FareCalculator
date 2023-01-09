@@ -18,6 +18,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FareCalculator {
     
@@ -29,7 +31,10 @@ public class FareCalculator {
     private JMenuItem red;
     private JMenuItem green;
     private JMenuItem yellow;
-    
+
+    private JLabel departProvinceLabel;
+    private JComboBox departProvinceCombo;
+
     private JLabel departLabel;
     private JComboBox departCombo;
     
@@ -108,12 +113,33 @@ public class FareCalculator {
                 panel3.setBackground(Color.yellow);
             }
         });
-        
+
+        Province khyber = new Province("Khyber Pakhtunkhwa");
+        Province punjab = new Province("Punjab");
+
+//        Add cities to provinces
+//        khyber.addCity("Islamabad");
+        khyber.addCity("Peshawar");
+
+        punjab.addCity("Lahore");
+//        punjab.addCity("Islamabad");
+//        punjab.addCity("Faisalabad");
+//        punjab.addCity("Gujranwala");
+
+        // Add provinces to a list
+        List<Province> provinces = new ArrayList<>();
+        provinces.add(khyber);
+        provinces.add(punjab);
+
+         departProvinceLabel = new JLabel("Select province for Departure City: ");
+         departProvinceCombo = new JComboBox();
+        for (Province province : provinces) {
+            departProvinceCombo.addItem(province.getName());
+        }
+
         departLabel = new JLabel("Departure City: ");
         departCombo = new JComboBox();
-        departCombo.addItem("Lahore");
-        departCombo.addItem("Peshawar");
-        
+
         Class = new JLabel("Class");
         economy = new JCheckBox("Economy");
         AC = new JCheckBox("AC");
@@ -130,7 +156,31 @@ public class FareCalculator {
         
         seatLabel = new JLabel("Total Seats");
         seatText = new JTextField("");
-        
+
+        departProvinceCombo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JComboBox cb = (JComboBox)e.getSource();
+                String provinceName = (String)cb.getSelectedItem();
+
+                // Get the selected province
+                Province selectedProvince = null;
+                for (Province province : provinces) {
+                    if (province.getName().equals(provinceName)) {
+                        selectedProvince = province;
+                        break;
+                    }
+                }
+
+                // Update the cities in the arrCombo combo box
+                departCombo.removeAllItems();
+                for (String city : selectedProvince.getCities()) {
+                    departCombo.addItem(city);
+                }
+            }
+        });
+
+
         computeFare = new JButton("Compute Fare");
         
         computeFare.addActionListener(new ActionListener() {
@@ -253,6 +303,8 @@ public class FareCalculator {
         panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 0, 30));
         panel3.setBorder(BorderFactory.createEmptyBorder(30, 30, 0, 30));
         panel.setLayout(grdLayout);
+        panel.add(departProvinceLabel);
+        panel.add(departProvinceCombo);
         panel.add(departLabel);
         panel.add(departCombo);
         panel1.add(Class);
@@ -275,4 +327,26 @@ public class FareCalculator {
         
     }
     
+}
+
+class Province {
+    private String name;
+    private List<String> cities;
+
+    public Province(String name) {
+        this.name = name;
+        this.cities = new ArrayList<>();
+    }
+
+    public void addCity(String city) {
+        this.cities.add(city);
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public List<String> getCities() {
+        return this.cities;
+    }
 }
